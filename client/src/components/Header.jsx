@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Activity, PlusCircle, ListFilter, ShieldCheck, Database, HardDrive } from 'lucide-react';
+import { Activity, PlusCircle, ListFilter, Database, HardDrive } from 'lucide-react';
 import { fetchHealth } from '../services/api';
 
-export const Header: React.FC = () => {
-  const [health, setHealth] = useState<{
-    database?: string;
-    orthanc?: string;
-  }>({});
+export const Header = () => {
+  const [health, setHealth] = useState({});
 
   useEffect(() => {
     const check = async () => {

@@ -19,14 +19,13 @@ import {
   Filter,
   Download,
 } from 'lucide-react';
-import { ExaminationOrder, WorklistStats } from '../../types';
 import { fetchWorklist, updateExaminationWorkflowStatus } from '../../services/api';
 import { ExaminationDetailDrawer } from './ExaminationDetailDrawer';
 
-export const WorklistPage: React.FC = () => {
+export const WorklistPage = () => {
   // Data state
-  const [orders, setOrders] = useState<ExaminationOrder[]>([]);
-  const [stats, setStats] = useState<WorklistStats>({
+  const [orders, setOrders] = useState([]);
+  const [stats, setStats] = useState({
     total: 0,
     pendingUpload: 0,
     pendingReport: 0,
@@ -35,19 +34,19 @@ export const WorklistPage: React.FC = () => {
     imagesAvailable: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
 
   // Filter state
   const [search, setSearch] = useState('');
-  const [selectedModality, setSelectedModality] = useState<string>('ALL');
-  const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
-  const [selectedAvailability, setSelectedAvailability] = useState<string>('ALL');
-  const [dateRange, setDateRange] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('createdAt');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedModality, setSelectedModality] = useState('ALL');
+  const [selectedStatus, setSelectedStatus] = useState('ALL');
+  const [selectedAvailability, setSelectedAvailability] = useState('ALL');
+  const [dateRange, setDateRange] = useState('all');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('desc');
 
   // Selected Order for Slide-over Drawer
-  const [selectedOrder, setSelectedOrder] = useState<ExaminationOrder | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   // Load Worklist
   const loadWorklist = useCallback(async () => {
@@ -73,8 +72,8 @@ export const WorklistPage: React.FC = () => {
       } else {
         setError('Failed to retrieve examinations worklist.');
       }
-    } catch (err: unknown) {
-      setError((err as Error).message || 'Network error fetching worklist');
+    } catch (err) {
+      setError(err.message || 'Network error fetching worklist');
     } finally {
       setLoading(false);
     }
@@ -85,20 +84,20 @@ export const WorklistPage: React.FC = () => {
   }, [loadWorklist]);
 
   // Handle Quick Status Update (e.g. claim study)
-  const handleStatusChange = async (orderId: string, newStatus: string) => {
+  const handleStatusChange = async (orderId, newStatus) => {
     try {
       const res = await updateExaminationWorkflowStatus(orderId, newStatus, 'Radiologist');
       if (res.success && res.data) {
         // Refresh local items
         setOrders(prev =>
-          prev.map(o => (o.orderId === orderId ? { ...o, workflowStatus: res.data!.workflowStatus } : o))
+          prev.map(o => (o.orderId === orderId ? { ...o, workflowStatus: res.data.workflowStatus } : o))
         );
         if (selectedOrder && selectedOrder.orderId === orderId) {
-          setSelectedOrder(prev => (prev ? { ...prev, workflowStatus: res.data!.workflowStatus } : null));
+          setSelectedOrder(prev => (prev ? { ...prev, workflowStatus: res.data.workflowStatus } : null));
         }
       }
-    } catch (err: unknown) {
-      alert(`Status update failed: ${(err as Error).message}`);
+    } catch (err) {
+      alert(`Status update failed: ${err.message}`);
     }
   };
 
@@ -331,7 +330,7 @@ export const WorklistPage: React.FC = () => {
                 onChange={e => {
                   const [field, order] = e.target.value.split('-');
                   setSortBy(field);
-                  setSortOrder(order as 'asc' | 'desc');
+                  setSortOrder(order);
                 }}
               >
                 <option value="createdAt-desc">Newest First</option>
@@ -433,7 +432,7 @@ export const WorklistPage: React.FC = () => {
                       {/* Modality & Procedure */}
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
-                          <span className={`badge-modality badge-modality-${order.modality.toLowerCase()}`}>
+                          <span className={`badge-modality badge-modality-${order.modality ? order.modality.toLowerCase() : ''}`}>
                             {order.modality}
                           </span>
                           <span style={{ fontWeight: 500, color: '#f3f4f6' }}>{order.examinationName}</span>
@@ -524,7 +523,7 @@ export const WorklistPage: React.FC = () => {
                           {/* Launch OHIF Viewer Button */}
                           {isAvailable ? (
                             <Link
-                              to={`/viewer/${encodeURIComponent(order.studyInstanceUid!)}`}
+                              to={`/viewer/${encodeURIComponent(order.studyInstanceUid)}`}
                               className="btn btn-primary btn-sm"
                               title="Launch Integrated Medical Viewer with OHIF"
                               style={{ textDecoration: 'none', padding: '6px 10px', fontSize: '0.78rem' }}

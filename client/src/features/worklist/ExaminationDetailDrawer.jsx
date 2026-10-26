@@ -17,15 +17,8 @@ import {
   Building,
   Download,
 } from 'lucide-react';
-import { ExaminationOrder } from '../../types';
 
-interface ExaminationDetailDrawerProps {
-  order: ExaminationOrder | null;
-  onClose: () => void;
-  onStatusChange?: (orderId: string, newStatus: string) => void;
-}
-
-export const ExaminationDetailDrawer: React.FC<ExaminationDetailDrawerProps> = ({
+export const ExaminationDetailDrawer = ({
   order,
   onClose,
   onStatusChange,
@@ -53,7 +46,7 @@ export const ExaminationDetailDrawer: React.FC<ExaminationDetailDrawerProps> = (
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-              <span className={`badge-modality badge-modality-${order.modality.toLowerCase()}`}>
+              <span className={`badge-modality badge-modality-${order.modality ? order.modality.toLowerCase() : ''}`}>
                 {order.modality}
               </span>
               <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '1rem', color: '#fff' }}>
@@ -280,7 +273,7 @@ export const ExaminationDetailDrawer: React.FC<ExaminationDetailDrawerProps> = (
         >
           {isDicomReady ? (
             <Link
-              to={`/viewer/${encodeURIComponent(order.studyInstanceUid!)}`}
+              to={`/viewer/${encodeURIComponent(order.studyInstanceUid)}`}
               className="btn btn-primary"
               style={{ justifyContent: 'center', textDecoration: 'none', padding: '12px' }}
             >

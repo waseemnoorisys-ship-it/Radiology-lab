@@ -3,26 +3,20 @@ import { Link } from 'react-router-dom';
 import { UploadCloud, FileUp, CheckCircle, AlertCircle, ExternalLink, HardDrive, List } from 'lucide-react';
 import { uploadExaminationDicom } from '../../services/api';
 
-interface DicomUploadSectionProps {
-  orderId: string;
-  accessionNumber: string;
-  onUploadSuccess?: (data: any) => void;
-}
-
-export const DicomUploadSection: React.FC<DicomUploadSectionProps> = ({
+export const DicomUploadSection = ({
   orderId,
   accessionNumber,
   onUploadSuccess,
 }) => {
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [uploadResult, setUploadResult] = useState<any | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadProgress, setUploadProgress] = useState(null);
+  const [error, setError] = useState(null);
+  const [uploadResult, setUploadResult] = useState(null);
+  const fileInputRef = useRef(null);
 
-  const formatFileSize = (bytes: number): string => {
+  const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 B';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
@@ -30,20 +24,20 @@ export const DicomUploadSection: React.FC<DicomUploadSectionProps> = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const handleFiles = (files: FileList | null) => {
+  const handleFiles = (files) => {
     if (!files || files.length === 0) return;
     const fileArray = Array.from(files);
     setSelectedFiles(fileArray);
     setError(null);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
     handleFiles(e.dataTransfer.files);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
   };
@@ -70,8 +64,8 @@ export const DicomUploadSection: React.FC<DicomUploadSectionProps> = ({
       } else {
         setError(res.error || 'Upload to Orthanc failed.');
       }
-    } catch (err: unknown) {
-      setError((err as Error).message || 'Network error during upload');
+    } catch (err) {
+      setError(err.message || 'Network error during upload');
     } finally {
       setUploading(false);
       setUploadProgress(null);

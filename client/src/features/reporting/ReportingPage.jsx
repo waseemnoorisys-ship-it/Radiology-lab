@@ -20,33 +20,27 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import {
-  ExaminationOrder,
-  Report,
-  ReportTemplate,
-  ReportSectionValue,
-} from '../../types';
-import {
   fetchReportByOrderId,
   saveDraftReport,
   finalizeReport,
 } from '../../services/api';
 
-export const ReportingPage: React.FC = () => {
-  const { orderId } = useParams<{ orderId: string }>();
+export const ReportingPage = () => {
+  const { orderId } = useParams();
   const navigate = useNavigate();
 
   // Load state
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   // Entities
-  const [order, setOrder] = useState<ExaminationOrder | null>(null);
-  const [report, setReport] = useState<Report | null>(null);
-  const [template, setTemplate] = useState<ReportTemplate | null>(null);
+  const [order, setOrder] = useState(null);
+  const [report, setReport] = useState(null);
+  const [template, setTemplate] = useState(null);
 
   // Form state
-  const [sectionValues, setSectionValues] = useState<Record<string, Record<string, any>>>({});
+  const [sectionValues, setSectionValues] = useState({});
   const [findings, setFindings] = useState('');
   const [impression, setImpression] = useState('');
   const [recommendations, setRecommendations] = useState('');
@@ -62,7 +56,7 @@ export const ReportingPage: React.FC = () => {
   const [amendmentReason, setAmendmentReason] = useState('');
 
   // UI Mode: 'edit' or 'preview'
-  const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
+  const [activeTab, setActiveTab] = useState('editor');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -78,10 +72,12 @@ export const ReportingPage: React.FC = () => {
 
           if (rep) {
             // Existing report loaded
-            const secMap: Record<string, Record<string, any>> = {};
-            rep.sections.forEach(s => {
-              secMap[s.sectionId] = { ...s.fields };
-            });
+            const secMap = {};
+            if (rep.sections) {
+              rep.sections.forEach(s => {
+                secMap[s.sectionId] = { ...s.fields };
+              });
+            }
             setSectionValues(secMap);
             setFindings(rep.findings || '');
             setImpression(rep.impression || '');
@@ -94,21 +90,27 @@ export const ReportingPage: React.FC = () => {
             if (rep.radiologist?.licenseNumber) setLicenseNumber(rep.radiologist.licenseNumber);
           } else if (tpl) {
             // Initialize from template defaults
-            const secMap: Record<string, Record<string, any>> = {};
-            tpl.sections.forEach(sec => {
-              secMap[sec.sectionId] = {};
-              sec.fields.forEach(f => {
-                if (f.defaultValue !== undefined) {
-                  secMap[sec.sectionId][f.fieldId] = f.defaultValue;
+            const secMap = {};
+            if (tpl.sections) {
+              tpl.sections.forEach(sec => {
+                secMap[sec.sectionId] = {};
+                if (sec.fields) {
+                  sec.fields.forEach(f => {
+                    if (f.defaultValue !== undefined) {
+                      secMap[sec.sectionId][f.fieldId] = f.defaultValue;
+                    }
+                  });
                 }
               });
-            });
+            }
             setSectionValues(secMap);
 
             // Set impression default from template if present
             const impField = tpl.sections
-              .flatMap(s => s.fields)
-              .find(f => f.fieldId === 'impression');
+              ? tpl.sections
+                  .flatMap(s => s.fields || [])
+                  .find(f => f.fieldId === 'impression')
+              : null;
             if (impField && impField.defaultValue) {
               setImpression(String(impField.defaultValue));
             }
@@ -122,7 +124,7 @@ export const ReportingPage: React.FC = () => {
       .finally(() => setLoading(false));
   }, [orderId]);
 
-  const handleFieldChange = (sectionId: string, fieldId: string, value: any) => {
+  const handleFieldChange = (sectionId, fieldId, value) => {
     setSectionValues(prev => ({
       ...prev,
       [sectionId]: {
@@ -133,7 +135,7 @@ export const ReportingPage: React.FC = () => {
   };
 
   const constructPayload = () => {
-    const sections: ReportSectionValue[] = template
+    const sections = template && template.sections
       ? template.sections.map(s => ({
           sectionId: s.sectionId,
           title: s.title,
@@ -176,8 +178,8 @@ export const ReportingPage: React.FC = () => {
       } else {
         setError(res.error || 'Failed to save draft report.');
       }
-    } catch (err: unknown) {
-      setError((err as Error).message);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setSubmitting(false);
     }
@@ -195,7 +197,7 @@ export const ReportingPage: React.FC = () => {
     setSuccessMessage(null);
 
     try {
-      const payload: any = constructPayload();
+      const payload = constructPayload();
       if (report?.status === 'FINALIZED' || report?.status === 'AMENDED') {
         if (!amendmentReason.trim()) {
           setError('Please provide a reason for amending this finalized report.');
@@ -215,8 +217,8 @@ export const ReportingPage: React.FC = () => {
       } else {
         setError(res.error || 'Failed to finalize report.');
       }
-    } catch (err: unknown) {
-      setError((err as Error).message);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setSubmitting(false);
     }
@@ -457,6 +459,7 @@ export const ReportingPage: React.FC = () => {
 
           {/* Section 1: Dynamic Template-driven Sections */}
           {template &&
+            template.sections &&
             template.sections.map(section => (
               <div key={section.sectionId} className="glass-panel" style={{ padding: '22px' }}>
                 <h3
@@ -475,7 +478,7 @@ export const ReportingPage: React.FC = () => {
                 </h3>
 
                 <div className="form-grid">
-                  {section.fields.map(field => {
+                  {section.fields && section.fields.map(field => {
                     const currentVal =
                       sectionValues[section.sectionId]?.[field.fieldId] !== undefined
                         ? sectionValues[section.sectionId][field.fieldId]
@@ -788,7 +791,7 @@ export const ReportingPage: React.FC = () => {
 
           {/* Report Sections Content */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontSize: '0.92rem' }}>
-            {template?.sections.map(section => (
+            {template?.sections && template.sections.map(section => (
               <div key={section.sectionId}>
                 <h4
                   style={{
@@ -805,7 +808,7 @@ export const ReportingPage: React.FC = () => {
                   {section.title}
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {section.fields.map(field => {
+                  {section.fields && section.fields.map(field => {
                     const val = sectionValues[section.sectionId]?.[field.fieldId];
                     if (val === undefined || val === '') return null;
 

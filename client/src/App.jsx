@@ -6,7 +6,7 @@ import { WorklistPage } from './features/worklist/WorklistPage';
 import { MedicalViewerPage } from './features/viewer/MedicalViewerPage';
 import { ReportingPage } from './features/reporting/ReportingPage';
 
-export const App: React.FC = () => {
+export const App = () => {
   return (
     <BrowserRouter>
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

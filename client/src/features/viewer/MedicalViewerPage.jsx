@@ -12,14 +12,13 @@ import {
   Check,
   AlertTriangle,
 } from 'lucide-react';
-import { ExaminationOrder } from '../../types';
 import { fetchWorklist } from '../../services/api';
 
-export const MedicalViewerPage: React.FC = () => {
-  const { studyInstanceUid } = useParams<{ studyInstanceUid: string }>();
+export const MedicalViewerPage = () => {
+  const { studyInstanceUid } = useParams();
   const navigate = useNavigate();
 
-  const [order, setOrder] = useState<ExaminationOrder | null>(null);
+  const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
@@ -91,7 +90,7 @@ export const MedicalViewerPage: React.FC = () => {
           {order ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.85rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span className={`badge-modality badge-modality-${order.modality.toLowerCase()}`}>
+                <span className={`badge-modality badge-modality-${order.modality ? order.modality.toLowerCase() : ''}`}>
                   {order.modality}
                 </span>
                 <strong style={{ color: '#fff' }}>{order.patientName}</strong>

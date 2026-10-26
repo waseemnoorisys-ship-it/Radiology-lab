@@ -13,14 +13,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import {
-  Patient,
-  ModalityMaster,
-  BodyRegionMaster,
-  ExaminationMaster,
-  SupportingMaster,
-  ExaminationOrder,
-} from '../../types';
-import {
   fetchModalities,
   fetchBodyRegions,
   fetchExaminations,
@@ -31,44 +23,44 @@ import {
 } from '../../services/api';
 import { DicomUploadSection } from './DicomUploadSection';
 
-export const NewExaminationPage: React.FC = () => {
+export const NewExaminationPage = () => {
   // Master Data state
-  const [modalities, setModalities] = useState<ModalityMaster[]>([]);
-  const [bodyRegions, setBodyRegions] = useState<BodyRegionMaster[]>([]);
-  const [examinations, setExaminations] = useState<ExaminationMaster[]>([]);
-  const [doctors, setDoctors] = useState<SupportingMaster[]>([]);
+  const [modalities, setModalities] = useState([]);
+  const [bodyRegions, setBodyRegions] = useState([]);
+  const [examinations, setExaminations] = useState([]);
+  const [doctors, setDoctors] = useState([]);
 
   // Patient Search & Selection state
   const [patientSearchQuery, setPatientSearchQuery] = useState('');
-  const [patientSearchResults, setPatientSearchResults] = useState<Patient[]>([]);
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [patientSearchResults, setPatientSearchResults] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
   const [showNewPatientModal, setShowNewPatientModal] = useState(false);
 
   // New Patient Form state
   const [newPatient, setNewPatient] = useState({
     patientId: '',
     fullName: '',
-    gender: 'UNKNOWN' as const,
+    gender: 'UNKNOWN',
     age: '',
     contactPhone: '',
     email: '',
   });
 
   // Examination Form state
-  const [selectedModality, setSelectedModality] = useState<string>('');
-  const [selectedBodyRegion, setSelectedBodyRegion] = useState<string>('');
-  const [selectedExam, setSelectedExam] = useState<ExaminationMaster | null>(null);
-  const [laterality, setLaterality] = useState<string>('NOT_APPLICABLE');
-  const [contrast, setContrast] = useState<string>('NOT_APPLICABLE');
-  const [protocol, setProtocol] = useState<string>('');
-  const [clinicalIndication, setClinicalIndication] = useState<string>('');
-  const [referringDoctor, setReferringDoctor] = useState<string>('');
-  const [additionalNotes, setAdditionalNotes] = useState<string>('');
+  const [selectedModality, setSelectedModality] = useState('');
+  const [selectedBodyRegion, setSelectedBodyRegion] = useState('');
+  const [selectedExam, setSelectedExam] = useState(null);
+  const [laterality, setLaterality] = useState('NOT_APPLICABLE');
+  const [contrast, setContrast] = useState('NOT_APPLICABLE');
+  const [protocol, setProtocol] = useState('');
+  const [clinicalIndication, setClinicalIndication] = useState('');
+  const [referringDoctor, setReferringDoctor] = useState('');
+  const [additionalNotes, setAdditionalNotes] = useState('');
 
   // UI status
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [createdOrder, setCreatedOrder] = useState<ExaminationOrder | null>(null);
+  const [error, setError] = useState(null);
+  const [createdOrder, setCreatedOrder] = useState(null);
 
   // Load initial master data
   useEffect(() => {
@@ -99,15 +91,15 @@ export const NewExaminationPage: React.FC = () => {
   }, [selectedModality, selectedBodyRegion]);
 
   // When Examination is selected, auto-configure defaults
-  const handleExamChange = (examCode: string) => {
+  const handleExamChange = (examCode) => {
     const exam = examinations.find(e => e.code === examCode) || null;
     setSelectedExam(exam);
     if (exam) {
       setContrast(exam.contrastApplicability || 'NOT_APPLICABLE');
-      if (exam.standardProtocols.length > 0) {
+      if (exam.standardProtocols && exam.standardProtocols.length > 0) {
         setProtocol(exam.standardProtocols[0]);
       }
-      if (exam.clinicalIndications.length > 0) {
+      if (exam.clinicalIndications && exam.clinicalIndications.length > 0) {
         setClinicalIndication(exam.clinicalIndications[0]);
       }
       if (exam.lateralityRequired) {
@@ -131,7 +123,7 @@ export const NewExaminationPage: React.FC = () => {
   }, [patientSearchQuery]);
 
   // Create Patient Handler
-  const handleCreatePatientSubmit = async (e: React.FormEvent) => {
+  const handleCreatePatientSubmit = async (e) => {
     e.preventDefault();
     if (!newPatient.patientId || !newPatient.fullName) {
       setError('Patient ID and Full Name are required');
@@ -156,15 +148,15 @@ export const NewExaminationPage: React.FC = () => {
       } else {
         setError(res.error || 'Failed to create patient record');
       }
-    } catch (err: unknown) {
-      setError((err as Error).message);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   // Submit Examination Handler
-  const handleSubmitExamination = async (e: React.FormEvent) => {
+  const handleSubmitExamination = async (e) => {
     e.preventDefault();
     if (!selectedPatient) {
       setError('Please select or create a patient first');
@@ -198,8 +190,8 @@ export const NewExaminationPage: React.FC = () => {
       } else {
         setError(res.error || 'Failed to create examination order');
       }
-    } catch (err: unknown) {
-      setError((err as Error).message);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -310,7 +302,7 @@ export const NewExaminationPage: React.FC = () => {
                     <select
                       className="form-select"
                       value={newPatient.gender}
-                      onChange={e => setNewPatient({ ...newPatient, gender: e.target.value as any })}
+                      onChange={e => setNewPatient({ ...newPatient, gender: e.target.value })}
                     >
                       <option value="UNKNOWN">Select Gender</option>
                       <option value="M">Male (M)</option>
@@ -520,7 +512,7 @@ export const NewExaminationPage: React.FC = () => {
                   value={protocol}
                   onChange={e => setProtocol(e.target.value)}
                 />
-                {selectedExam && selectedExam.standardProtocols.length > 0 && (
+                {selectedExam && selectedExam.standardProtocols && selectedExam.standardProtocols.length > 0 && (
                   <div className="chip-container">
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Suggestions:</span>
                     {selectedExam.standardProtocols.map(p => (
@@ -545,8 +537,9 @@ export const NewExaminationPage: React.FC = () => {
                   value={clinicalIndication}
                   onChange={e => setClinicalIndication(e.target.value)}
                   required
-                />
-                {selectedExam && selectedExam.clinicalIndications.length > 0 && (
+                >
+                </input>
+                {selectedExam && selectedExam.clinicalIndications && selectedExam.clinicalIndications.length > 0 && (
                   <div className="chip-container">
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Indications:</span>
                     {selectedExam.clinicalIndications.map(ind => (
