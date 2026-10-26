@@ -1,0 +1,29 @@
+{
+  "Name" : "RadiologyLabPACS",
+  "StorageDirectory" : "./storage",
+  "IndexDirectory" : "./storage",
+  "StorageCompression" : false,
+  "HttpPort" : 8042,
+  "DicomPort" : 4242,
+  "RemoteAccessAllowed" : true,
+  "AuthenticationEnabled" : false,
+  "DicomAet" : "ORTHANC",
+  "DicomCheckCalledAet" : false,
+  "DeflateLevel" : 6,
+  "Plugins" : [
+    "./plugins/OrthancDicomWeb.dll",
+    "./plugins/OrthancOHIF.dll"
+  ],
+  "DicomWeb" : {
+    "Enable" : true,
+    "Root" : "/dicom-web/",
+    "EnableWado" : true,
+    "WadoRoot" : "/wado",
+    "Ssl" : false,
+    "StudiesMetadata" : "Full"
+  },
+  "OHIF" : {
+    "DataSource" : "dicom-web",
+    "Preload" : false
+  }
+}
