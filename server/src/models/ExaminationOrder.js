@@ -89,7 +89,7 @@ const ExaminationOrderSchema = new Schema(
     workflowStatus: {
       type: String,
       enum: ['PENDING_UPLOAD', 'PENDING_REPORT', 'IN_PROGRESS', 'DRAFT_SAVED', 'FINALIZED', 'AMENDED', 'CANCELLED'],
-      default: 'PENDING_UPLOAD',
+      default: 'PENDING_REPORT',
       index: true,
     },
     imageAvailability: {

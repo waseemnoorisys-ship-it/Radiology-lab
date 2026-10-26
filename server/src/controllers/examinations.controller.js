@@ -51,7 +51,7 @@ export async function createExamination(req, res, next) {
       referringDoctor: payload.referringDoctor || '',
       performingFacility: payload.performingFacility || 'Main Radiology Suite',
       additionalNotes: payload.additionalNotes || '',
-      workflowStatus: 'PENDING_UPLOAD',
+      workflowStatus: 'PENDING_REPORT',
       imageAvailability: 'NO_IMAGES',
     });
 

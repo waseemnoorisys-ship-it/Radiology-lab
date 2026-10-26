@@ -55,10 +55,10 @@ export const Header = () => {
           <span>Mongo</span>
           <span className={`status-dot ${health.database === 'connected' ? 'online' : 'offline'}`} />
         </div>
-        <div className="status-pill" title="Orthanc DICOM PACS Connection">
-          <HardDrive size={13} style={{ color: '#9ca3af' }} />
-          <span>Orthanc</span>
-          <span className={`status-dot ${health.orthanc === 'connected' ? 'online' : 'offline'}`} />
+        <div className="status-pill" title="Client-Side Zero-Storage DICOM Mode Active">
+          <HardDrive size={13} style={{ color: '#38bdf8' }} />
+          <span>Zero-Storage Mode</span>
+          <span className="status-dot online" />
         </div>
       </div>
     </header>

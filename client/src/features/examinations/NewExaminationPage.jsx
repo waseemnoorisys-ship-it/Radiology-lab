@@ -21,7 +21,7 @@ import {
   createPatient,
   createExamination,
 } from '../../services/api';
-import { DicomUploadSection } from './DicomUploadSection';
+import { Link } from 'react-router-dom';
 
 export const NewExaminationPage = () => {
   // Master Data state
@@ -223,9 +223,11 @@ export const NewExaminationPage = () => {
             <CheckCircle2 size={36} />
           </div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '8px' }}>Examination Order Created!</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>The order is registered in MongoDB with status <span className="badge badge-warning">PENDING_UPLOAD</span></p>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+            The order is registered in MongoDB with status <span className="badge badge-primary">READY FOR REPORTING</span>
+          </p>
 
-          <div style={{ background: 'var(--bg-input)', padding: '20px', borderRadius: 'var(--radius-md)', textAlign: 'left', marginBottom: '28px', border: '1px solid var(--border-color)' }}>
+          <div style={{ background: 'var(--bg-input)', padding: '20px', borderRadius: 'var(--radius-md)', textAlign: 'left', marginBottom: '24px', border: '1px solid var(--border-color)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.9rem' }}>
               <div><span style={{ color: 'var(--text-muted)' }}>Order ID:</span> <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{createdOrder.orderId}</span></div>
               <div><span style={{ color: 'var(--text-muted)' }}>Accession #:</span> <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{createdOrder.accessionNumber}</span></div>
@@ -235,19 +237,22 @@ export const NewExaminationPage = () => {
             </div>
           </div>
 
-          {/* Phase 5 DICOM Upload Ingestion */}
-          <DicomUploadSection
-            orderId={createdOrder.orderId}
-            accessionNumber={createdOrder.accessionNumber}
-          />
-
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '24px' }}>
+          <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', marginTop: '24px' }}>
+            <Link
+              to="/worklist"
+              className="btn btn-primary"
+              style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', fontSize: '0.95rem' }}
+            >
+              <span>Go to Radiologist Worklist</span>
+              <ArrowRight size={16} />
+            </Link>
             <button
               onClick={() => {
                 setCreatedOrder(null);
                 setSelectedExam(null);
               }}
               className="btn btn-secondary"
+              style={{ padding: '12px 20px', fontSize: '0.95rem' }}
             >
               Register Another Order
             </button>
