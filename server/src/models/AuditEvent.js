@@ -1,15 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IAuditEvent extends Document {
-  eventType: string;
-  entityType: 'EXAMINATION_ORDER' | 'PATIENT' | 'REPORT' | 'DICOM_UPLOAD';
-  entityId: string;
-  actor: string;
-  details?: Record<string, unknown>;
-  timestamp: Date;
-}
-
-const AuditEventSchema = new Schema<IAuditEvent>(
+const AuditEventSchema = new Schema(
   {
     eventType: {
       type: String,
@@ -45,4 +36,4 @@ const AuditEventSchema = new Schema<IAuditEvent>(
   }
 );
 
-export const AuditEvent = mongoose.model<IAuditEvent>('AuditEvent', AuditEventSchema);
+export const AuditEvent = mongoose.model('AuditEvent', AuditEventSchema);

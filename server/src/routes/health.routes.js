@@ -1,10 +1,10 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import mongoose from 'mongoose';
 import { env } from '../config/env.js';
 
 export const healthRouter = Router();
 
-healthRouter.get('/', async (req: Request, res: Response) => {
+healthRouter.get('/', async (req, res) => {
   const mongoStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
   
   let orthancStatus = 'unknown';
@@ -18,7 +18,7 @@ healthRouter.get('/', async (req: Request, res: Response) => {
 
     if (response.ok) {
       orthancStatus = 'connected';
-      const data = (await response.json()) as Record<string, unknown>;
+      const data = await response.json();
       orthancInfo = {
         name: data.Name,
         version: data.Version,
@@ -29,8 +29,8 @@ healthRouter.get('/', async (req: Request, res: Response) => {
     } else {
       orthancStatus = `error (HTTP ${response.status})`;
     }
-  } catch (error: unknown) {
-    orthancStatus = `unreachable (${(error as Error).message})`;
+  } catch (error) {
+    orthancStatus = `unreachable (${error.message})`;
   }
 
   const isHealthy = mongoStatus === 'connected' && orthancStatus === 'connected';

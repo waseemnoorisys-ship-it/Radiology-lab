@@ -1,11 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
 import { Patient } from '../models/Patient.js';
 import { AuditEvent } from '../models/AuditEvent.js';
 
-export async function getPatients(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getPatients(req, res, next) {
   try {
     const { search, limit = 20 } = req.query;
-    const filter: Record<string, unknown> = {};
+    const filter = {};
 
     if (search && typeof search === 'string') {
       const regex = new RegExp(search.trim(), 'i');
@@ -26,7 +25,7 @@ export async function getPatients(req: Request, res: Response, next: NextFunctio
   }
 }
 
-export async function getPatientById(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getPatientById(req, res, next) {
   try {
     const { id } = req.params;
     const patient = await Patient.findOne({
@@ -47,7 +46,7 @@ export async function getPatientById(req: Request, res: Response, next: NextFunc
   }
 }
 
-export async function createPatient(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function createPatient(req, res, next) {
   try {
     const patientData = req.body;
 

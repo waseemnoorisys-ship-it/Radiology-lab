@@ -1,22 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export type SupportingCategory =
-  | 'REFERRING_DOCTOR'
-  | 'FACILITY'
-  | 'DEPARTMENT';
-
-export interface ISupportingMaster extends Document {
-  category: SupportingCategory;
-  code: string;
-  displayName: string;
-  details?: Record<string, unknown>;
-  isActive: boolean;
-  order: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const SupportingMasterSchema = new Schema<ISupportingMaster>(
+const SupportingMasterSchema = new Schema(
   {
     category: {
       type: String,
@@ -54,4 +38,4 @@ const SupportingMasterSchema = new Schema<ISupportingMaster>(
 
 SupportingMasterSchema.index({ category: 1, code: 1 }, { unique: true });
 
-export const SupportingMaster = mongoose.model<ISupportingMaster>('SupportingMaster', SupportingMasterSchema);
+export const SupportingMaster = mongoose.model('SupportingMaster', SupportingMasterSchema);

@@ -1,19 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IPatient extends Document {
-  patientId: string;
-  fullName: string;
-  dateOfBirth?: Date;
-  age?: number;
-  gender: 'M' | 'F' | 'O' | 'UNKNOWN';
-  contactPhone?: string;
-  email?: string;
-  address?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const PatientSchema = new Schema<IPatient>(
+const PatientSchema = new Schema(
   {
     patientId: {
       type: String,
@@ -63,4 +50,4 @@ const PatientSchema = new Schema<IPatient>(
 // Search index on patientId and fullName for fast worklist and autocomplete queries
 PatientSchema.index({ fullName: 'text', patientId: 'text' });
 
-export const Patient = mongoose.model<IPatient>('Patient', PatientSchema);
+export const Patient = mongoose.model('Patient', PatientSchema);

@@ -1,6 +1,5 @@
 import { connectDB, disconnectDB } from '../config/db.js';
 import { Patient } from '../models/Patient.js';
-import { ExaminationOrder } from '../models/ExaminationOrder.js';
 import { ModalityMaster } from '../models/ModalityMaster.js';
 import { BodyRegionMaster } from '../models/BodyRegionMaster.js';
 import { ExaminationMaster } from '../models/ExaminationMaster.js';
@@ -86,7 +85,7 @@ export async function runSeed() {
 }
 
 // Execute standalone if directly invoked
-if (process.argv[1]?.includes('seed.ts') || process.argv[1]?.includes('seed.js')) {
+if (process.argv[1]?.includes('seed.js')) {
   runSeed()
     .then(async () => {
       await disconnectDB();

@@ -17,7 +17,7 @@ async function bootstrap() {
     });
 
     // Graceful Shutdown Handling
-    const handleShutdown = async (signal: string) => {
+    const handleShutdown = async (signal) => {
       console.log(`\n[Server] Received ${signal}. Shutting down gracefully...`);
       server.close(async () => {
         console.log('[Server] HTTP server closed');

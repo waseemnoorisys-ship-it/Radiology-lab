@@ -1,16 +1,15 @@
-import { IReport } from '../../models/Report.js';
-import { IExaminationOrder } from '../../models/ExaminationOrder.js';
-
 /**
- * Pure TypeScript PDF-1.4 Generator for Radiology Consultation Reports
+ * Pure JavaScript PDF-1.4 Generator for Radiology Consultation Reports
  * Zero external dependencies. Guaranteed compatibility with Adobe Acrobat, Chrome, Edge, Apple Preview.
  */
 export class RadiologyPdfGenerator {
-  private objects: string[] = [];
-  private fontRegularObjId = 0;
-  private fontBoldObjId = 0;
+  constructor() {
+    this.objects = [];
+    this.fontRegularObjId = 0;
+    this.fontBoldObjId = 0;
+  }
 
-  public generateReportPdf(report: IReport, order: IExaminationOrder): Buffer {
+  generateReportPdf(report, order) {
     this.objects = [];
 
     // Object 1: Catalog
@@ -54,20 +53,20 @@ export class RadiologyPdfGenerator {
     return this.assemblePdf();
   }
 
-  private addObject(content: string): number {
+  addObject(content) {
     this.objects.push(content);
     return this.objects.length;
   }
 
-  private escapePdfText(text: string): string {
+  escapePdfText(text) {
     return text
       .replace(/\\/g, '\\\\')
       .replace(/\(/g, '\\(')
       .replace(/\)/g, '\\)');
   }
 
-  private buildStreamContent(report: IReport, order: IExaminationOrder): string {
-    const lines: string[] = [];
+  buildStreamContent(report, order) {
+    const lines = [];
 
     // Page coordinates: (0,0) is bottom-left, (612, 792) is top-right
     let y = 745;
@@ -76,12 +75,12 @@ export class RadiologyPdfGenerator {
 
     // Helper: draw text
     const drawText = (
-      text: string,
-      x: number,
-      yPos: number,
-      font: 'F1' | 'F2',
-      size: number,
-      rgb: [number, number, number] = [0, 0, 0]
+      text,
+      x,
+      yPos,
+      font,
+      size,
+      rgb = [0, 0, 0]
     ) => {
       lines.push(
         `BT /${font} ${size} Tf ${rgb[0]} ${rgb[1]} ${rgb[2]} rg 1 0 0 1 ${x} ${yPos} Tm (${this.escapePdfText(text)}) Tj ET`
@@ -89,7 +88,7 @@ export class RadiologyPdfGenerator {
     };
 
     // Helper: draw line
-    const drawHLine = (yPos: number, rgb: [number, number, number] = [0.8, 0.8, 0.8], width = 1) => {
+    const drawHLine = (yPos, rgb = [0.8, 0.8, 0.8], width = 1) => {
       lines.push(
         `${rgb[0]} ${rgb[1]} ${rgb[2]} RG ${width} w ${leftMargin} ${yPos} m ${rightMargin} ${yPos} l S`
       );
@@ -97,12 +96,12 @@ export class RadiologyPdfGenerator {
 
     // Helper: draw rectangle
     const drawRect = (
-      x: number,
-      yPos: number,
-      w: number,
-      h: number,
-      fillRgb: [number, number, number],
-      strokeRgb?: [number, number, number]
+      x,
+      yPos,
+      w,
+      h,
+      fillRgb,
+      strokeRgb
     ) => {
       if (strokeRgb) {
         lines.push(
@@ -279,9 +278,9 @@ export class RadiologyPdfGenerator {
     return lines.join('\n');
   }
 
-  private assemblePdf(): Buffer {
+  assemblePdf() {
     let pdf = `%PDF-1.4\n%\xE2\xE3\xCF\xD3\n`;
-    const offsets: number[] = [];
+    const offsets = [];
 
     for (let i = 0; i < this.objects.length; i++) {
       offsets.push(Buffer.byteLength(pdf, 'latin1'));

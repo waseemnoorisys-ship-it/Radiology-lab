@@ -1,38 +1,6 @@
 import { env } from '../../config/env.js';
 
-export interface OrthancUploadResult {
-  ID: string;
-  ParentPatient: string;
-  ParentSeries: string;
-  ParentStudy: string;
-  Path: string;
-  Status: string;
-}
-
-export interface OrthancStudy {
-  ID: string;
-  IsStable: boolean;
-  MainDicomTags: {
-    StudyInstanceUID: string;
-    StudyDate?: string;
-    StudyTime?: string;
-    StudyDescription?: string;
-    AccessionNumber?: string;
-    ReferringPhysicianName?: string;
-  };
-  ParentPatient: string;
-  PatientMainDicomTags: {
-    PatientID?: string;
-    PatientName?: string;
-    PatientSex?: string;
-    PatientBirthDate?: string;
-  };
-  Series: string[];
-}
-
 export class OrthancService {
-  private baseUrl: string;
-
   constructor() {
     this.baseUrl = env.ORTHANC_URL;
   }
@@ -40,7 +8,7 @@ export class OrthancService {
   /**
    * Uploads a raw DICOM instance binary to Orthanc /instances REST API.
    */
-  async uploadInstance(buffer: Buffer): Promise<OrthancUploadResult> {
+  async uploadInstance(buffer) {
     const url = `${this.baseUrl}/instances`;
 
     const res = await fetch(url, {
@@ -56,13 +24,13 @@ export class OrthancService {
       throw new Error(`Orthanc upload failed (HTTP ${res.status}): ${errorText || res.statusText}`);
     }
 
-    return (await res.json()) as OrthancUploadResult;
+    return await res.json();
   }
 
   /**
    * Fetches study metadata from Orthanc by its internal UUID.
    */
-  async getStudy(studyId: string): Promise<OrthancStudy> {
+  async getStudy(studyId) {
     const url = `${this.baseUrl}/studies/${encodeURIComponent(studyId)}`;
 
     const res = await fetch(url);
@@ -70,13 +38,13 @@ export class OrthancService {
       throw new Error(`Failed to retrieve Orthanc study ${studyId} (HTTP ${res.status})`);
     }
 
-    return (await res.json()) as OrthancStudy;
+    return await res.json();
   }
 
   /**
    * Modifies DICOM tags of an existing instance and returns the modified DICOM binary buffer.
    */
-  async modifyInstance(instanceId: string, replacements: Record<string, string>): Promise<Buffer> {
+  async modifyInstance(instanceId, replacements) {
     const url = `${this.baseUrl}/instances/${encodeURIComponent(instanceId)}/modify`;
     const res = await fetch(url, {
       method: 'POST',
@@ -101,7 +69,7 @@ export class OrthancService {
   /**
    * Deletes an instance from Orthanc by its UUID.
    */
-  async deleteInstance(instanceId: string): Promise<void> {
+  async deleteInstance(instanceId) {
     const url = `${this.baseUrl}/instances/${encodeURIComponent(instanceId)}`;
     const res = await fetch(url, { method: 'DELETE' });
     if (!res.ok && res.status !== 404) {
@@ -112,7 +80,7 @@ export class OrthancService {
   /**
    * Deletes a study from Orthanc by its UUID.
    */
-  async deleteStudy(studyId: string): Promise<void> {
+  async deleteStudy(studyId) {
     const url = `${this.baseUrl}/studies/${encodeURIComponent(studyId)}`;
     const res = await fetch(url, { method: 'DELETE' });
     if (!res.ok && res.status !== 404) {
@@ -123,7 +91,7 @@ export class OrthancService {
   /**
    * Confirms study is retrievable via standard DICOMweb endpoint.
    */
-  async verifyDicomWeb(studyInstanceUid: string): Promise<boolean> {
+  async verifyDicomWeb(studyInstanceUid) {
     const url = `${this.baseUrl}/dicom-web/studies/${encodeURIComponent(studyInstanceUid)}/metadata`;
 
     try {

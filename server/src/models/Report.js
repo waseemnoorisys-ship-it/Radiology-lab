@@ -1,61 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export type ReportStatus = 'DRAFT' | 'FINALIZED' | 'AMENDED';
-
-export interface IReportSectionValue {
-  sectionId: string;
-  title: string;
-  fields: Record<string, any>;
-}
-
-export interface IReportAmendment {
-  version: number;
-  amendedAt: Date;
-  amendedBy: string;
-  reason: string;
-  previousContent: {
-    sections: IReportSectionValue[];
-    findings: string;
-    impression: string;
-    recommendations?: string;
-  };
-}
-
-export interface IReport extends Document {
-  reportId: string;
-  examination: mongoose.Types.ObjectId;
-  orderId: string;
-  accessionNumber: string;
-  patient: mongoose.Types.ObjectId;
-  patientId: string;
-  patientName: string;
-  modality: string;
-  examinationName: string;
-  templateCode: string;
-  templateVersion: number;
-  status: ReportStatus;
-  radiologist: {
-    name: string;
-    licenseNumber?: string;
-    role?: string;
-  };
-  sections: IReportSectionValue[];
-  findings: string;
-  impression: string;
-  recommendations?: string;
-  technique?: string;
-  comparison?: string;
-  criticalResultsNotified: boolean;
-  criticalNotificationDetails?: string;
-  finalizedAt?: Date;
-  finalizedBy?: string;
-  version: number;
-  amendmentHistory: IReportAmendment[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const ReportSectionValueSchema = new Schema<IReportSectionValue>(
+const ReportSectionValueSchema = new Schema(
   {
     sectionId: { type: String, required: true },
     title: { type: String, required: true },
@@ -64,7 +9,7 @@ const ReportSectionValueSchema = new Schema<IReportSectionValue>(
   { _id: false }
 );
 
-const ReportAmendmentSchema = new Schema<IReportAmendment>(
+const ReportAmendmentSchema = new Schema(
   {
     version: { type: Number, required: true },
     amendedAt: { type: Date, default: Date.now },
@@ -75,7 +20,7 @@ const ReportAmendmentSchema = new Schema<IReportAmendment>(
   { _id: false }
 );
 
-const ReportSchema = new Schema<IReport>(
+const ReportSchema = new Schema(
   {
     reportId: {
       type: String,
@@ -192,4 +137,4 @@ const ReportSchema = new Schema<IReport>(
 
 ReportSchema.index({ orderId: 1, version: -1 });
 
-export const Report = mongoose.model<IReport>('Report', ReportSchema);
+export const Report = mongoose.model('Report', ReportSchema);

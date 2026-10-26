@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { env } from './env.js';
 
-export async function connectDB(): Promise<typeof mongoose> {
+export async function connectDB() {
   try {
     mongoose.set('strictQuery', true);
     const conn = await mongoose.connect(env.MONGODB_URI);
@@ -22,7 +22,7 @@ export async function connectDB(): Promise<typeof mongoose> {
   }
 }
 
-export async function disconnectDB(): Promise<void> {
+export async function disconnectDB() {
   await mongoose.disconnect();
   console.log('[MongoDB] Disconnected gracefully');
 }

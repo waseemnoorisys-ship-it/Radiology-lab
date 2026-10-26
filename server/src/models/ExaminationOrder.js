@@ -1,49 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export type WorkflowStatus =
-  | 'PENDING_UPLOAD'
-  | 'PENDING_REPORT'
-  | 'IN_PROGRESS'
-  | 'DRAFT_SAVED'
-  | 'FINALIZED'
-  | 'AMENDED'
-  | 'CANCELLED';
-
-export type ImageAvailability =
-  | 'NO_IMAGES'
-  | 'UPLOADING'
-  | 'AVAILABLE'
-  | 'FAILED';
-
-export interface IExaminationOrder extends Document {
-  orderId: string;
-  accessionNumber: string;
-  patient: mongoose.Types.ObjectId;
-  patientId: string;
-  patientName: string;
-  modality: string;
-  bodyRegion: string;
-  examinationName: string;
-  examinationCode?: string;
-  laterality: 'LEFT' | 'RIGHT' | 'BILATERAL' | 'UNILATERAL' | 'NOT_APPLICABLE';
-  contrast: 'WITHOUT_CONTRAST' | 'WITH_CONTRAST' | 'WITHOUT_AND_WITH_CONTRAST' | 'NOT_APPLICABLE';
-  protocol?: string;
-  clinicalIndication?: string;
-  referringDoctor?: string;
-  performingFacility?: string;
-  additionalNotes?: string;
-  workflowStatus: WorkflowStatus;
-  imageAvailability: ImageAvailability;
-  orthancStudyId?: string;
-  studyInstanceUid?: string;
-  seriesCount?: number;
-  instanceCount?: number;
-  report?: mongoose.Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const ExaminationOrderSchema = new Schema<IExaminationOrder>(
+const ExaminationOrderSchema = new Schema(
   {
     orderId: {
       type: String,
@@ -173,4 +130,4 @@ const ExaminationOrderSchema = new Schema<IExaminationOrder>(
 ExaminationOrderSchema.index({ modality: 1, workflowStatus: 1 });
 ExaminationOrderSchema.index({ createdAt: -1 });
 
-export const ExaminationOrder = mongoose.model<IExaminationOrder>('ExaminationOrder', ExaminationOrderSchema);
+export const ExaminationOrder = mongoose.model('ExaminationOrder', ExaminationOrderSchema);

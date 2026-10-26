@@ -1,4 +1,3 @@
-import { Request, Response, NextFunction } from 'express';
 import { ExaminationOrder } from '../models/ExaminationOrder.js';
 import { Patient } from '../models/Patient.js';
 import { AuditEvent } from '../models/AuditEvent.js';
@@ -12,7 +11,7 @@ function generateIdentifiers() {
   };
 }
 
-export async function createExamination(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function createExamination(req, res, next) {
   try {
     const payload = req.body;
 
@@ -80,13 +79,13 @@ export async function createExamination(req: Request, res: Response, next: NextF
   }
 }
 
-export async function getExaminations(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getExaminations(req, res, next) {
   try {
     const { patientId, modality, status, search, limit = 50, skip = 0 } = req.query;
-    const filter: Record<string, unknown> = {};
+    const filter = {};
 
     if (patientId) filter.patientId = patientId;
-    if (modality) filter.modality = (modality as string).toUpperCase();
+    if (modality) filter.modality = modality.toUpperCase();
     if (status) filter.workflowStatus = status;
 
     if (search && typeof search === 'string') {
@@ -117,7 +116,7 @@ export async function getExaminations(req: Request, res: Response, next: NextFun
   }
 }
 
-export async function getExaminationById(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getExaminationById(req, res, next) {
   try {
     const { id } = req.params;
     const order = await ExaminationOrder.findOne({

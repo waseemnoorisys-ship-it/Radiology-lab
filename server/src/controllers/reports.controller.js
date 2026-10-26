@@ -1,17 +1,16 @@
-import { Request, Response, NextFunction } from 'express';
-import { Report, IReport } from '../models/Report.js';
+import { Report } from '../models/Report.js';
 import { ExaminationOrder } from '../models/ExaminationOrder.js';
 import { ReportTemplate } from '../models/ReportTemplate.js';
 import { AuditEvent } from '../models/AuditEvent.js';
 import { radiologyPdfGenerator } from '../services/pdf/pdfGenerator.js';
 
-function generateReportId(): string {
+function generateReportId() {
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   const randomSuffix = Math.floor(1000 + Math.random() * 9000).toString();
   return `REP-${dateStr}-${randomSuffix}`;
 }
 
-export async function getReportByOrderId(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getReportByOrderId(req, res, next) {
   try {
     const { orderId } = req.params;
 
@@ -60,7 +59,7 @@ export async function getReportByOrderId(req: Request, res: Response, next: Next
   }
 }
 
-export async function getReportById(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getReportById(req, res, next) {
   try {
     const { id } = req.params;
     const report = await Report.findOne({
@@ -81,7 +80,7 @@ export async function getReportById(req: Request, res: Response, next: NextFunct
   }
 }
 
-export async function saveDraftReport(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function saveDraftReport(req, res, next) {
   try {
     const { orderId } = req.params;
     const payload = req.body;
@@ -156,7 +155,7 @@ export async function saveDraftReport(req: Request, res: Response, next: NextFun
     await report.save();
 
     // Link report to order & update status
-    order.report = report._id as any;
+    order.report = report._id;
     order.workflowStatus = 'DRAFT_SAVED';
     await order.save();
 
@@ -183,7 +182,7 @@ export async function saveDraftReport(req: Request, res: Response, next: NextFun
   }
 }
 
-export async function finalizeReport(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function finalizeReport(req, res, next) {
   try {
     const { orderId } = req.params;
     const payload = req.body;
@@ -295,7 +294,7 @@ export async function finalizeReport(req: Request, res: Response, next: NextFunc
     await report.save();
 
     // Update order status to FINALIZED
-    order.report = report._id as any;
+    order.report = report._id;
     order.workflowStatus = 'FINALIZED';
     await order.save();
 
@@ -323,7 +322,7 @@ export async function finalizeReport(req: Request, res: Response, next: NextFunc
   }
 }
 
-export async function downloadReportPdf(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function downloadReportPdf(req, res, next) {
   try {
     const { orderId } = req.params;
 
@@ -363,7 +362,7 @@ export async function downloadReportPdf(req: Request, res: Response, next: NextF
       eventType: 'REPORT_PDF_DOWNLOADED',
       entityType: 'REPORT',
       entityId: report.reportId,
-      actor: (req.query.user as string) || 'Authorized Clinician',
+      actor: req.query.user || 'Authorized Clinician',
       details: {
         orderId: order.orderId,
         accessionNumber: order.accessionNumber,
@@ -376,4 +375,3 @@ export async function downloadReportPdf(req: Request, res: Response, next: NextF
     next(error);
   }
 }
-

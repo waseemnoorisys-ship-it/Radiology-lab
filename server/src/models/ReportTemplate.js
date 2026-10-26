@@ -1,45 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export type TemplateFieldType =
-  | 'text'
-  | 'textarea'
-  | 'select'
-  | 'multiselect'
-  | 'boolean'
-  | 'number';
-
-export interface ITemplateField {
-  fieldId: string;
-  label: string;
-  type: TemplateFieldType;
-  options?: string[];
-  unit?: string;
-  required?: boolean;
-  defaultValue?: unknown;
-  helpText?: string;
-}
-
-export interface ITemplateSection {
-  sectionId: string;
-  title: string;
-  order: number;
-  description?: string;
-  fields: ITemplateField[];
-}
-
-export interface IReportTemplate extends Document {
-  templateCode: string;
-  name: string;
-  modalityCode: string;
-  applicableExaminations: string[];
-  version: number;
-  sections: ITemplateSection[];
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const TemplateFieldSchema = new Schema<ITemplateField>(
+const TemplateFieldSchema = new Schema(
   {
     fieldId: { type: String, required: true },
     label: { type: String, required: true },
@@ -57,7 +18,7 @@ const TemplateFieldSchema = new Schema<ITemplateField>(
   { _id: false }
 );
 
-const TemplateSectionSchema = new Schema<ITemplateSection>(
+const TemplateSectionSchema = new Schema(
   {
     sectionId: { type: String, required: true },
     title: { type: String, required: true },
@@ -68,7 +29,7 @@ const TemplateSectionSchema = new Schema<ITemplateSection>(
   { _id: false }
 );
 
-const ReportTemplateSchema = new Schema<IReportTemplate>(
+const ReportTemplateSchema = new Schema(
   {
     templateCode: {
       type: String,
@@ -109,4 +70,4 @@ const ReportTemplateSchema = new Schema<IReportTemplate>(
   }
 );
 
-export const ReportTemplate = mongoose.model<IReportTemplate>('ReportTemplate', ReportTemplateSchema);
+export const ReportTemplate = mongoose.model('ReportTemplate', ReportTemplateSchema);

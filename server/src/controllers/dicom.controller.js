@@ -1,12 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
 import { ExaminationOrder } from '../models/ExaminationOrder.js';
 import { AuditEvent } from '../models/AuditEvent.js';
 import { isValidDicomBuffer } from '../services/dicom/validator.js';
 import { orthancService } from '../services/orthanc/orthanc.service.js';
 
-export async function uploadExaminationDicom(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function uploadExaminationDicom(req, res, next) {
   const { id } = req.params;
-  const files = (req.files as Express.Multer.File[]) || [];
+  const files = req.files || [];
 
   try {
     // 1. Validate files presence
@@ -40,7 +39,7 @@ export async function uploadExaminationDicom(req: Request, res: Response, next: 
     await order.save();
 
     // 3. Binary DICOM Validation for every file
-    const validationErrors: Array<{ file: string; reason: string }> = [];
+    const validationErrors = [];
     for (const file of files) {
       const check = isValidDicomBuffer(file.buffer);
       if (!check.valid) {
@@ -70,7 +69,7 @@ export async function uploadExaminationDicom(req: Request, res: Response, next: 
     const targetAccession = order.accessionNumber;
     const targetDescription = order.examinationName || 'Radiology Examination';
 
-    const temporaryStudyIds = new Set<string>();
+    const temporaryStudyIds = new Set();
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -141,7 +140,7 @@ export async function uploadExaminationDicom(req: Request, res: Response, next: 
     for (const seriesId of studyMetadata.Series) {
       try {
         const seriesRes = await fetch(`${process.env.ORTHANC_URL || 'http://127.0.0.1:8042'}/series/${encodeURIComponent(seriesId)}`);
-        const seriesData = (await seriesRes.json()) as { Instances?: string[] };
+        const seriesData = await seriesRes.json();
         totalInstances += seriesData.Instances?.length || 0;
       } catch {
         totalInstances += 1;

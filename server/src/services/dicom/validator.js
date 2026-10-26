@@ -2,7 +2,7 @@
  * Validates DICOM file structure per DICOM Part 10 (PS 3.10) specification.
  * Valid files have a 128-byte file preamble followed by the 4-byte magic signature "DICM" (0x44, 0x49, 0x43, 0x4D).
  */
-export function isValidDicomBuffer(buffer: Buffer): { valid: boolean; reason?: string } {
+export function isValidDicomBuffer(buffer) {
   if (buffer.length < 132) {
     return {
       valid: false,

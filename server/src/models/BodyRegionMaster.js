@@ -1,17 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IBodyRegionMaster extends Document {
-  code: string;
-  displayName: string;
-  applicableModalities: string[];
-  supportsLaterality: boolean;
-  isActive: boolean;
-  order: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const BodyRegionMasterSchema = new Schema<IBodyRegionMaster>(
+const BodyRegionMasterSchema = new Schema(
   {
     code: {
       type: String,
@@ -50,4 +39,4 @@ const BodyRegionMasterSchema = new Schema<IBodyRegionMaster>(
   }
 );
 
-export const BodyRegionMaster = mongoose.model<IBodyRegionMaster>('BodyRegionMaster', BodyRegionMasterSchema);
+export const BodyRegionMaster = mongoose.model('BodyRegionMaster', BodyRegionMasterSchema);

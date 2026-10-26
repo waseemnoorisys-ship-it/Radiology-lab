@@ -1,20 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { env } from '../config/env.js';
 
-export interface AppError extends Error {
-  statusCode?: number;
-  code?: number | string;
-  keyValue?: Record<string, unknown>;
-}
-
-export function errorHandler(
-  err: AppError,
-  req: Request,
-  res: Response,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: NextFunction
-): void {
+export function errorHandler(err, req, res, next) {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal server error';
 

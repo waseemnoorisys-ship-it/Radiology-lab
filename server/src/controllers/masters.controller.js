@@ -1,11 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
 import { ModalityMaster } from '../models/ModalityMaster.js';
 import { BodyRegionMaster } from '../models/BodyRegionMaster.js';
 import { ExaminationMaster } from '../models/ExaminationMaster.js';
 import { ReportTemplate } from '../models/ReportTemplate.js';
 import { SupportingMaster } from '../models/SupportingMaster.js';
 
-export async function getModalities(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getModalities(req, res, next) {
   try {
     const modalities = await ModalityMaster.find({ isActive: true }).sort({ order: 1, code: 1 });
     res.json({
@@ -18,10 +17,10 @@ export async function getModalities(req: Request, res: Response, next: NextFunct
   }
 }
 
-export async function getBodyRegions(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getBodyRegions(req, res, next) {
   try {
     const { modality } = req.query;
-    const filter: Record<string, unknown> = { isActive: true };
+    const filter = { isActive: true };
 
     if (modality && typeof modality === 'string') {
       filter.applicableModalities = modality.toUpperCase();
@@ -38,10 +37,10 @@ export async function getBodyRegions(req: Request, res: Response, next: NextFunc
   }
 }
 
-export async function getExaminations(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getExaminations(req, res, next) {
   try {
     const { modality, bodyRegion } = req.query;
-    const filter: Record<string, unknown> = { isActive: true };
+    const filter = { isActive: true };
 
     if (modality && typeof modality === 'string') {
       filter.modalityCode = modality.toUpperCase();
@@ -61,10 +60,10 @@ export async function getExaminations(req: Request, res: Response, next: NextFun
   }
 }
 
-export async function getReportTemplates(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getReportTemplates(req, res, next) {
   try {
     const { code, modality } = req.query;
-    const filter: Record<string, unknown> = { isActive: true };
+    const filter = { isActive: true };
 
     if (code && typeof code === 'string') {
       filter.templateCode = code.toUpperCase();
@@ -84,10 +83,10 @@ export async function getReportTemplates(req: Request, res: Response, next: Next
   }
 }
 
-export async function getSupportingMasters(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getSupportingMasters(req, res, next) {
   try {
     const { category } = req.query;
-    const filter: Record<string, unknown> = { isActive: true };
+    const filter = { isActive: true };
 
     if (category && typeof category === 'string') {
       filter.category = category.toUpperCase();

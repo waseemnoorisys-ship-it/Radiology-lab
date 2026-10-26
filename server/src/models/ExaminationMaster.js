@@ -1,22 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IExaminationMaster extends Document {
-  code: string;
-  displayName: string;
-  modalityCode: string;
-  bodyRegionCode: string;
-  lateralityRequired: boolean;
-  contrastApplicability: 'WITHOUT_CONTRAST' | 'WITH_CONTRAST' | 'WITHOUT_AND_WITH_CONTRAST' | 'NOT_APPLICABLE';
-  standardProtocols: string[];
-  clinicalIndications: string[];
-  defaultTemplateCode: string;
-  isActive: boolean;
-  order: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const ExaminationMasterSchema = new Schema<IExaminationMaster>(
+const ExaminationMasterSchema = new Schema(
   {
     code: {
       type: String,
@@ -84,4 +68,4 @@ const ExaminationMasterSchema = new Schema<IExaminationMaster>(
 // Compound index for dependent dropdown queries (modality + region)
 ExaminationMasterSchema.index({ modalityCode: 1, bodyRegionCode: 1 });
 
-export const ExaminationMaster = mongoose.model<IExaminationMaster>('ExaminationMaster', ExaminationMasterSchema);
+export const ExaminationMaster = mongoose.model('ExaminationMaster', ExaminationMasterSchema);

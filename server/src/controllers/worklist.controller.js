@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
 import { ExaminationOrder } from '../models/ExaminationOrder.js';
 import { AuditEvent } from '../models/AuditEvent.js';
 
-export async function getWorklist(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getWorklist(req, res, next) {
   try {
     const {
       search,
@@ -16,17 +15,17 @@ export async function getWorklist(req: Request, res: Response, next: NextFunctio
       limit = 50,
     } = req.query;
 
-    const filter: Record<string, unknown> = {};
+    const filter = {};
 
     // 1. Modality Filter
     if (modality && modality !== 'ALL') {
-      filter.modality = (modality as string).toUpperCase();
+      filter.modality = modality.toUpperCase();
     }
 
     // 2. Workflow Status Filter
     if (workflowStatus && workflowStatus !== 'ALL') {
-      if ((workflowStatus as string).includes(',')) {
-        filter.workflowStatus = { $in: (workflowStatus as string).split(',') };
+      if (workflowStatus.includes(',')) {
+        filter.workflowStatus = { $in: workflowStatus.split(',') };
       } else {
         filter.workflowStatus = workflowStatus;
       }
@@ -75,7 +74,7 @@ export async function getWorklist(req: Request, res: Response, next: NextFunctio
     // 6. Sorting
     const sortField = typeof sortBy === 'string' ? sortBy : 'createdAt';
     const direction = sortOrder === 'asc' ? 1 : -1;
-    const sortObj: Record<string, 1 | -1> = { [sortField]: direction };
+    const sortObj = { [sortField]: direction };
 
     // 7. Pagination
     const pageNum = Math.max(1, Number(page));
@@ -147,7 +146,7 @@ export async function getWorklist(req: Request, res: Response, next: NextFunctio
   }
 }
 
-export async function getWorklistStats(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getWorklistStats(req, res, next) {
   try {
     const [byStatus, byModality] = await Promise.all([
       ExaminationOrder.aggregate([
@@ -170,7 +169,7 @@ export async function getWorklistStats(req: Request, res: Response, next: NextFu
   }
 }
 
-export async function updateStudyWorkflowStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function updateStudyWorkflowStatus(req, res, next) {
   try {
     const { id } = req.params;
     const { workflowStatus, actor = 'Radiologist' } = req.body;

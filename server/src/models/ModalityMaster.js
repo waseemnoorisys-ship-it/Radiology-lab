@@ -1,16 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IModalityMaster extends Document {
-  code: string;
-  displayName: string;
-  description?: string;
-  isActive: boolean;
-  order: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const ModalityMasterSchema = new Schema<IModalityMaster>(
+const ModalityMasterSchema = new Schema(
   {
     code: {
       type: String,
@@ -44,4 +34,4 @@ const ModalityMasterSchema = new Schema<IModalityMaster>(
   }
 );
 
-export const ModalityMaster = mongoose.model<IModalityMaster>('ModalityMaster', ModalityMasterSchema);
+export const ModalityMaster = mongoose.model('ModalityMaster', ModalityMasterSchema);
