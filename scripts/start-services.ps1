@@ -20,11 +20,21 @@ function Test-PortIsOpen($port) {
 
 # 1. Start MongoDB if not already listening on 27017
 if (-not (Test-PortIsOpen 27017)) {
-    Write-Host "[MongoDB] Starting MongoDB on port 27017..." -ForegroundColor Yellow
     $dbPath = Join-Path $rootDir "data\db"
+    $lockFile = Join-Path $dbPath "mongod.lock"
+    
+    # Auto-heal: If mongod is not running but stale lock exists, remove it
+    $mongodProc = Get-Process mongod -ErrorAction SilentlyContinue
+    if (-not $mongodProc -and (Test-Path $lockFile)) {
+        Write-Host "[MongoDB] Clearing stale lock file from previous shutdown..." -ForegroundColor Yellow
+        Remove-Item -Force $lockFile -ErrorAction SilentlyContinue
+    }
+
+    Write-Host "[MongoDB] Starting MongoDB on port 27017..." -ForegroundColor Yellow
     if (-not (Test-Path $dbPath)) { New-Item -ItemType Directory -Force -Path $dbPath | Out-Null }
-    Start-Process -FilePath "C:\Program Files\MongoDB\Server\8.3\bin\mongod.exe" -ArgumentList "--dbpath `"$dbPath`"" -WindowStyle Hidden
-    Start-Sleep -Seconds 2
+    $logPath = Join-Path $rootDir "data\mongod.log"
+    Start-Process -FilePath "C:\Program Files\MongoDB\Server\8.3\bin\mongod.exe" -ArgumentList "--dbpath `"$dbPath`" --logpath `"$logPath`" --logappend" -WindowStyle Hidden
+    Start-Sleep -Seconds 3
 } else {
     Write-Host "[MongoDB] Already running on port 27017" -ForegroundColor Green
 }
