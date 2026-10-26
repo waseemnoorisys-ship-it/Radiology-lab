@@ -18,9 +18,11 @@ import {
   X,
   Filter,
   Download,
+  FolderOpen,
 } from 'lucide-react';
 import { fetchWorklist, updateExaminationWorkflowStatus } from '../../services/api';
 import { ExaminationDetailDrawer } from './ExaminationDetailDrawer';
+import { LocalDicomPickerModal } from '../viewer/LocalDicomPickerModal';
 
 export const WorklistPage = () => {
   // Data state
@@ -47,6 +49,9 @@ export const WorklistPage = () => {
 
   // Selected Order for Slide-over Drawer
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  // Selected Order for Local DICOM Picker Modal
+  const [pickerOrder, setPickerOrder] = useState(null);
 
   // Load Worklist
   const loadWorklist = useCallback(async () => {
@@ -533,12 +538,13 @@ export const WorklistPage = () => {
                             </Link>
                           ) : (
                             <button
-                              disabled
-                              className="btn btn-secondary btn-sm"
-                              title="Cannot view: DICOM images not yet uploaded to PACS"
-                              style={{ opacity: 0.4, cursor: 'not-allowed', padding: '6px 10px', fontSize: '0.78rem' }}
+                              type="button"
+                              onClick={() => setPickerOrder(order)}
+                              className="btn btn-primary btn-sm"
+                              title="Select local DICOM images from your computer to view in OHIF Viewer"
+                              style={{ padding: '6px 10px', fontSize: '0.78rem' }}
                             >
-                              <Eye size={14} />
+                              <FolderOpen size={14} />
                               <span>View</span>
                             </button>
                           )}
@@ -595,6 +601,15 @@ export const WorklistPage = () => {
         order={selectedOrder}
         onClose={() => setSelectedOrder(null)}
         onStatusChange={handleStatusChange}
+        onOpenLocalPicker={(ord) => setPickerOrder(ord)}
+      />
+
+      {/* Local DICOM Picker Modal */}
+      <LocalDicomPickerModal
+        order={pickerOrder}
+        isOpen={Boolean(pickerOrder)}
+        onClose={() => setPickerOrder(null)}
+        onStudyLoaded={() => loadWorklist()}
       />
     </div>
   );

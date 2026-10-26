@@ -11,8 +11,10 @@ import {
   Copy,
   Check,
   AlertTriangle,
+  FolderOpen,
 } from 'lucide-react';
 import { fetchWorklist } from '../../services/api';
+import { LocalDicomPickerModal } from './LocalDicomPickerModal';
 
 export const MedicalViewerPage = () => {
   const { studyInstanceUid } = useParams();
@@ -22,6 +24,7 @@ export const MedicalViewerPage = () => {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
+  const [showPicker, setShowPicker] = useState(false);
 
   useEffect(() => {
     if (!studyInstanceUid) return;
@@ -135,6 +138,17 @@ export const MedicalViewerPage = () => {
             <RefreshCw size={14} />
           </button>
 
+          {/* Select Local DICOM */}
+          <button
+            onClick={() => setShowPicker(true)}
+            className="btn btn-secondary btn-sm"
+            title="Load local DICOM files from your PC"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px' }}
+          >
+            <FolderOpen size={14} />
+            <span>Local DICOM</span>
+          </button>
+
           {/* Open in full external tab */}
           <a
             href={directViewerUrl}
@@ -178,6 +192,14 @@ export const MedicalViewerPage = () => {
           allow="fullscreen; clipboard-read; clipboard-write"
         />
       </div>
+
+      {/* Local DICOM Picker Modal */}
+      <LocalDicomPickerModal
+        order={order}
+        isOpen={showPicker}
+        onClose={() => setShowPicker(false)}
+        onStudyLoaded={() => setIframeKey(k => k + 1)}
+      />
     </div>
   );
 };

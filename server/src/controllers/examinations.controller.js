@@ -140,3 +140,55 @@ export async function getExaminationById(req, res, next) {
     next(error);
   }
 }
+
+export async function linkLocalStudyToExamination(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { studyInstanceUid, seriesCount, instanceCount, modality } = req.body;
+
+    const order = await ExaminationOrder.findOne({
+      $or: [
+        { _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null },
+        { orderId: id },
+        { accessionNumber: id },
+      ],
+    });
+
+    if (!order) {
+      res.status(404).json({ success: false, error: 'Examination order not found' });
+      return;
+    }
+
+    if (studyInstanceUid) order.studyInstanceUid = studyInstanceUid;
+    if (seriesCount) order.seriesCount = seriesCount;
+    if (instanceCount) order.instanceCount = instanceCount;
+    if (modality) order.modality = modality;
+    order.imageAvailability = 'AVAILABLE';
+    if (order.workflowStatus === 'PENDING_UPLOAD') {
+      order.workflowStatus = 'PENDING_REPORT';
+    }
+
+    await order.save();
+
+    await AuditEvent.create({
+      eventType: 'LOCAL_DICOM_LINKED',
+      entityType: 'EXAMINATION_ORDER',
+      entityId: order.orderId,
+      actor: 'Radiologist',
+      details: {
+        studyInstanceUid: order.studyInstanceUid,
+        instanceCount: order.instanceCount,
+        seriesCount: order.seriesCount,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: 'Local study linked successfully without server storage.',
+      data: order,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+

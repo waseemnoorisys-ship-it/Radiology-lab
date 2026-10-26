@@ -136,3 +136,12 @@ export async function finalizeReport(orderId, payload) {
   });
   return res.json();
 }
+
+export async function linkLocalStudyToOrder(orderId, payload) {
+  const res = await fetch(`${API_BASE}/examinations/${encodeURIComponent(orderId)}/local-study`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return res.json();
+}

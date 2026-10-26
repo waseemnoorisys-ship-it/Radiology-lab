@@ -16,12 +16,14 @@ import {
   Phone,
   Building,
   Download,
+  FolderOpen,
 } from 'lucide-react';
 
 export const ExaminationDetailDrawer = ({
   order,
   onClose,
   onStatusChange,
+  onOpenLocalPicker,
 }) => {
   if (!order) return null;
 
@@ -272,31 +274,59 @@ export const ExaminationDetailDrawer = ({
           }}
         >
           {isDicomReady ? (
-            <Link
-              to={`/viewer/${encodeURIComponent(order.studyInstanceUid)}`}
-              className="btn btn-primary"
-              style={{ justifyContent: 'center', textDecoration: 'none', padding: '12px' }}
-            >
-              <Eye size={16} />
-              <span>Open in Medical Image Viewer</span>
-            </Link>
+            <>
+              <Link
+                to={`/viewer/${encodeURIComponent(order.studyInstanceUid)}`}
+                className="btn btn-primary"
+                style={{ justifyContent: 'center', textDecoration: 'none', padding: '12px' }}
+              >
+                <Eye size={16} />
+                <span>Open in Medical Image Viewer</span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (onOpenLocalPicker) onOpenLocalPicker(order);
+                }}
+                className="btn btn-secondary"
+                style={{ justifyContent: 'center' }}
+              >
+                <FolderOpen size={16} />
+                <span>Load / Switch Local DICOM</span>
+              </button>
+            </>
           ) : (
-            <div
-              style={{
-                padding: '10px 14px',
-                background: 'rgba(245, 158, 11, 0.1)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
-                borderRadius: 'var(--radius-sm)',
-                color: '#fbbf24',
-                fontSize: '0.82rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              <AlertTriangle size={16} />
-              <span>DICOM images have not yet been archived in PACS for this study.</span>
-            </div>
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (onOpenLocalPicker) onOpenLocalPicker(order);
+                }}
+                className="btn btn-primary"
+                style={{ justifyContent: 'center', padding: '12px' }}
+              >
+                <FolderOpen size={16} />
+                <span>Select Local DICOM to View</span>
+              </button>
+              <div
+                style={{
+                  padding: '10px 14px',
+                  background: 'rgba(56, 189, 248, 0.08)',
+                  border: '1px solid rgba(56, 189, 248, 0.25)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: '#38bdf8',
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <AlertTriangle size={15} style={{ flexShrink: 0 }} />
+                <span>Zero-upload mode: load DICOM images directly from your computer into OHIF.</span>
+              </div>
+            </>
           )}
 
           {/* Report Action Button */}
